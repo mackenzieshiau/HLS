@@ -1,0 +1,27 @@
+## Status: Already implemented
+
+Authentication and per-user dashboard scoping are already in place from earlier work. Here's what exists today:
+
+**Auth pages**
+- `/auth` — combined login + signup with email/password tabs, plus Google sign-in. After signup, users are auto-logged in and redirected to `/dashboard`.
+
+**Protected dashboard**
+- `/dashboard` lives under `src/routes/_authenticated/`, which redirects unauthenticated visitors to `/auth`.
+- Header greets the user by display name (or email).
+- Forms list is filtered by `user_id = auth.uid()`.
+
+**Database**
+- `forms.user_id uuid` column exists.
+- RLS policies scope SELECT/INSERT/UPDATE/DELETE to `auth.uid() = user_id`.
+- Form creation sets `user_id` automatically from the current session.
+
+**Form creation UI** is unchanged — still just title + description.
+
+## What I'd do now
+
+Nothing — the requested feature is complete. If you want, I can:
+1. Verify it end-to-end in the preview (sign up a test user, create a form, confirm isolation).
+2. Add a "Forgot password" flow (not in the original request).
+3. Move on to tomorrow's task: adding questions to forms.
+
+Tell me which (or none) and I'll proceed.

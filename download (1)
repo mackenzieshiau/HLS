@@ -1,0 +1,289 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import {
+  ClipboardList,
+  MessagesSquare,
+  Flag,
+  ArrowRight,
+  ShieldCheck,
+  GraduationCap,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { SiteFooter } from "@/components/site-footer";
+import { supabase } from "@/integrations/supabase/client";
+import heroImage from "@/assets/hero-families.jpg";
+
+export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Home Language Screener — Parent-friendly home language survey" },
+      {
+        name: "description",
+        content:
+          "A parent/guardian-facing home language screener for schools. Collects required home language information and provides a clear next-step recommendation.",
+      },
+      { property: "og:title", content: "Home Language Screener" },
+      {
+        property: "og:description",
+        content:
+          "Parent-friendly home language survey for schools with a clear next-step recommendation.",
+      },
+    ],
+  }),
+  component: Landing,
+});
+
+const features = [
+  {
+    icon: ClipboardList,
+    title: "Collects required home language information",
+    body: "Gathers the standard Home Language Survey responses schools need at enrollment.",
+  },
+  {
+    icon: MessagesSquare,
+    title: "Uses parent-friendly wording",
+    body: "Plain, welcoming language so families can answer confidently and accurately.",
+  },
+  {
+    icon: Flag,
+    title: "Flags when a language other than English is reported",
+    body: "Automatically highlights responses that may need further review by your team.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Provides a clear next-step recommendation",
+    body: "Surfaces guidance without making an official EL/EB determination.",
+  },
+];
+
+function HeroNav() {
+  const [signedIn, setSignedIn] = useState(false);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setSignedIn(!!data.session));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) =>
+      setSignedIn(!!s),
+    );
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  return (
+    <header className="absolute inset-x-0 top-0 z-20">
+      <div className="mx-auto max-w-7xl px-6 h-20 flex items-center justify-between text-white">
+        <Link to="/" className="flex items-center gap-3 font-display font-bold text-xl">
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/30 backdrop-blur">
+            <GraduationCap className="h-5 w-5" />
+          </span>
+          <span className="tracking-tight">Home Language Screener</span>
+        </Link>
+        <nav className="flex items-center gap-2">
+          {signedIn ? (
+            <Link
+              to="/dashboard"
+              className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-medium text-white/90 hover:text-white"
+            >
+              Dashboard
+            </Link>
+          ) : (
+            <Link
+              to="/auth"
+              className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-medium text-white/90 hover:text-white"
+            >
+              Sign in
+            </Link>
+          )}
+          <Link
+            to="/demo"
+            className="inline-flex items-center rounded-full border border-white/70 px-5 py-2.5 text-sm font-semibold text-white hover:bg-white hover:text-primary transition-colors"
+          >
+            Try the Demo
+          </Link>
+        </nav>
+      </div>
+    </header>
+  );
+}
+
+function Landing() {
+  return (
+    <div className="min-h-screen flex flex-col bg-background">
+      <main className="flex-1">
+        {/* Hero */}
+        <section className="relative isolate overflow-hidden text-white">
+          <img
+            src={heroImage}
+            alt=""
+            width={1920}
+            height={1280}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 hero-overlay" />
+          {/* Light decorative graphics */}
+          <svg
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full opacity-[0.08] mix-blend-screen pointer-events-none"
+          >
+            <defs>
+              <pattern id="heroDots" width="28" height="28" patternUnits="userSpaceOnUse">
+                <circle cx="1.2" cy="1.2" r="1.2" fill="white" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#heroDots)" />
+          </svg>
+          <div className="pointer-events-none absolute -top-32 -left-24 h-96 w-96 rounded-full bg-primary-glow/30 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-40 -right-20 h-[28rem] w-[28rem] rounded-full bg-white/10 blur-3xl" />
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 100 100"
+            className="pointer-events-none absolute top-28 right-10 h-24 w-24 text-white/25 hidden md:block animate-[spin_40s_linear_infinite]"
+          >
+            <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="0.6" strokeDasharray="2 4" />
+          </svg>
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 60 60"
+            className="pointer-events-none absolute bottom-28 left-12 h-16 w-16 text-white/30 hidden md:block"
+          >
+            <path d="M30 4 L36 24 L56 30 L36 36 L30 56 L24 36 L4 30 L24 24 Z" fill="currentColor" opacity="0.6" />
+          </svg>
+          <HeroNav />
+
+          <div className="relative mx-auto max-w-5xl px-6 pt-40 pb-32 text-center">
+            <div className="inline-flex items-center gap-2 rounded-full bg-white/10 ring-1 ring-white/30 backdrop-blur px-4 py-1.5 text-xs font-medium uppercase tracking-[0.18em]">
+              <ShieldCheck className="h-3.5 w-3.5" />
+              For schools and families
+            </div>
+            <h1 className="mt-8 font-display font-extrabold text-5xl sm:text-6xl md:text-7xl leading-[1.02] tracking-tight text-white">
+              A simple way to collect <br className="hidden md:block" />
+              Home Language Survey responses.
+            </h1>
+            <p className="mt-8 text-lg sm:text-xl text-white/85 max-w-2xl mx-auto leading-relaxed">
+              A parent and guardian-facing tool that helps schools gather home
+              language information and identify when a student may need the next step
+              in the English learner identification process.
+            </p>
+            <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
+              <Link
+                to="/demo"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-sm font-bold uppercase tracking-[0.14em] text-primary shadow-xl hover:bg-white/90 transition"
+              >
+                Try the Demo Screener
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                to="/dashboard"
+                className="inline-flex items-center rounded-full border border-white/70 px-8 py-4 text-sm font-bold uppercase tracking-[0.14em] text-white hover:bg-white/10 transition"
+              >
+                Go to Dashboard
+              </Link>
+            </div>
+
+            {/* Commitment pills */}
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+              {[
+                { icon: ClipboardList, label: "Parent-Friendly" },
+                { icon: Flag, label: "Identifies EL Needs" },
+                { icon: ShieldCheck, label: "School-Trusted" },
+              ].map(({ icon: Icon, label }) => (
+                <span
+                  key={label}
+                  className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/5 px-5 py-2 text-xs font-bold uppercase tracking-[0.16em] text-white"
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  {label}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="relative border-t border-white/15">
+            <div className="mx-auto max-w-6xl px-6 py-6 text-center text-xs font-semibold tracking-[0.3em] uppercase text-white/70">
+              Built for K–12 enrollment teams
+            </div>
+          </div>
+        </section>
+
+        {/* Features */}
+        <section className="relative mx-auto max-w-6xl px-6 py-24">
+          <svg
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full text-primary/[0.06] pointer-events-none"
+          >
+            <defs>
+              <pattern id="featDots" width="24" height="24" patternUnits="userSpaceOnUse">
+                <circle cx="1" cy="1" r="1" fill="currentColor" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#featDots)" />
+          </svg>
+          <div className="relative max-w-3xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
+              What it does
+            </p>
+            <h2 className="mt-4 font-display font-extrabold text-4xl sm:text-5xl tracking-tight text-foreground">
+              Built around the questions families actually answer.
+            </h2>
+          </div>
+          <div className="relative mt-14 grid gap-6 sm:grid-cols-2">
+            {features.map((f) => (
+              <div
+                key={f.title}
+                className="group relative overflow-hidden rounded-3xl border border-border bg-card p-8 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition"
+              >
+                <div className="pointer-events-none absolute -top-16 -right-16 h-40 w-40 rounded-full bg-primary/5 blur-2xl transition group-hover:bg-primary/10" />
+                <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+                  <f.icon className="h-6 w-6" />
+                </div>
+                <h3 className="relative mt-6 font-display font-bold text-xl text-card-foreground">
+                  {f.title}
+                </h3>
+                <p className="relative mt-3 text-muted-foreground leading-relaxed">{f.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Compliance callout */}
+        <section className="mx-auto max-w-6xl px-6 pb-24">
+          <div className="relative overflow-hidden rounded-[2rem] bg-primary text-primary-foreground p-10 sm:p-14">
+            <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-primary-glow/40 blur-3xl" />
+            <div className="relative max-w-3xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/70">
+                Important note
+              </p>
+              <h2 className="mt-4 font-display font-extrabold text-3xl sm:text-4xl">
+                This tool does not determine EL/EB status.
+              </h2>
+              <p className="mt-5 text-white/85 leading-relaxed text-lg">
+                Official identification of an English Learner / Emergent Bilingual
+                student requires your school&apos;s formal review process and, when
+                applicable, a state-approved English language proficiency assessment.
+                Home Language Screener only collects home language information and
+                surfaces a next-step recommendation.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Secondary CTA */}
+        <section className="mx-auto max-w-3xl px-6 pb-28 text-center">
+          <h2 className="font-display font-extrabold text-4xl sm:text-5xl tracking-tight text-foreground">
+            See it in action.
+          </h2>
+          <p className="mt-4 text-lg text-muted-foreground">
+            Walk through the parent-facing survey and see the next-step recommendation.
+          </p>
+          <div className="mt-10">
+            <Button asChild size="lg" className="rounded-full px-8 py-6 text-sm font-bold uppercase tracking-[0.14em]">
+              <Link to="/demo">
+                Try the Demo Screener
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </section>
+      </main>
+
+      <SiteFooter />
+    </div>
+  );
+}
