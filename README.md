@@ -1,278 +1,162 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+Home Language Screener
 
-export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "14.5"
-  }
-  public: {
-    Tables: {
-      forms: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          require_login: boolean
-          title: string
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          require_login?: boolean
-          title: string
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          require_login?: boolean
-          title?: string
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          created_at: string
-          display_name: string | null
-          forms_view: string
-          id: string
-          theme: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          display_name?: string | null
-          forms_view?: string
-          id: string
-          theme?: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          display_name?: string | null
-          forms_view?: string
-          id?: string
-          theme?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      questions: {
-        Row: {
-          created_at: string
-          form_id: string
-          id: string
-          label: string
-          options: Json
-          order: number
-          type: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          form_id: string
-          id?: string
-          label?: string
-          options?: Json
-          order?: number
-          type: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          form_id?: string
-          id?: string
-          label?: string
-          options?: Json
-          order?: number
-          type?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "questions_form_id_fkey"
-            columns: ["form_id"]
-            isOneToOne: false
-            referencedRelation: "forms"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      responses: {
-        Row: {
-          answers: Json
-          form_id: string
-          id: string
-          submitted_at: string
-        }
-        Insert: {
-          answers?: Json
-          form_id: string
-          id?: string
-          submitted_at?: string
-        }
-        Update: {
-          answers?: Json
-          form_id?: string
-          id?: string
-          submitted_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "responses_form_id_fkey"
-            columns: ["form_id"]
-            isOneToOne: false
-            referencedRelation: "forms"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      [_ in never]: never
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-}
+A parent and guardian-facing web app that helps schools collect Home Language Survey responses and identify when a student may need the next step in the English Learner (EL) / Emergent Bilingual (EB) identification process.
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+Built with TanStack Start, React 19, Tailwind CSS v4, and Lovable Cloud (Supabase) for auth, database, and storage.
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+---
 
-export type Tables<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R
-    }
-    ? R
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R
-      }
-      ? R
-      : never
-    : never
+✨ Features
 
-export type TablesInsert<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I
-    }
-    ? I
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I
-      }
-      ? I
-      : never
-    : never
+For families (public)
+- Parent-friendly demo screener at `/demo` with bilingual labels.
+- Language picker covering every language supported by Google Translate, with an "Other" free-text fallback for parents who can't spell the language.
+- Live translation of every question and the thank-you message into the parent's selected language.
+- Birth date entry in addition to grade level, since grade conventions vary across cultures.
+- Clear next-step recommendation at the end (does not make an official EL/EB determination).
 
-export type TablesUpdate<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U
-    }
-    ? U
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U
-      }
-      ? U
-      : never
-    : never
+For schools (authenticated)
+- Email/password + Google sign-in via Lovable Cloud auth.
+- Protected dashboard at `/dashboard` — each user only sees their own forms.
+- Form builder at `/forms/:id/edit`:
+  - Short answer, multiple choice, and rating question types
+  - Drag-style reordering
+  - Live preview
+  - Save confirmation dialog
+  - "Require sign-in to respond" toggle per form
+- Shareable public links at `/forms/:id` — no Lovable login required for respondents (unless the toggle is on).
+- Response viewer at `/forms/:id/responses` with each submission rendered as a readable question/answer table.
+- Form stats on each dashboard card: total questions, breakdown by type, and number of completions.
+- Profile dialog with display name, password change (live strength meter + requirements checklist), light/dark theme, and list vs. card view preference.
+- Sort & filter forms by date or title, ascending or descending.
 
-export type Enums<
-  DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
-> = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never
+Design
+- "Alpha" design system: electric blue (`#0614FF`), deep indigo, bold Inter typography, pill-shaped CTAs, surface-card pattern across all pages.
+- Full-bleed hero photo with light decorative SVG graphics.
+- Responsive, light + dark mode.
 
-export type CompositeTypes<
-  PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
-> = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
+---
 
-export const Constants = {
-  public: {
-    Enums: {},
-  },
-} as const
+🧱 Tech stack
+
+| Layer | Tech |
+|---|---|
+| Framework | [TanStack Start v1](https://tanstack.com/start) (React 19, SSR) |
+| Build | Vite 7 |
+| Styling | Tailwind CSS v4 (via `@import` in `src/styles.css`) |
+| UI | shadcn/ui + Radix primitives + lucide-react icons |
+| Routing | TanStack Router (file-based, in `src/routes/`) |
+| Data | TanStack Query |
+| Backend | Lovable Cloud (Supabase: Postgres + Auth + RLS) |
+| Deploy target | Cloudflare Workers (edge) |
+| Package manager | Bun |
+
+---
+
+🚀 Getting started
+
+```bash
+# install
+bun install
+
+# dev server (http://localhost:8080)
+bun run dev
+
+# production build
+bun run build
+```
+
+Environment variables
+The following are auto-managed by Lovable Cloud and live in `.env`:
+
+```
+VITE_SUPABASE_URL=
+VITE_SUPABASE_PUBLISHABLE_KEY=
+VITE_SUPABASE_PROJECT_ID=
+```
+
+Do not commit a service role key — it isn't required at runtime.
+
+---
+
+📁 Project structure
+
+```
+src/
+├── assets/                  # hero image, static assets
+├── components/
+│   ├── ui/                  # shadcn primitives (button, input, dialog, ...)
+│   ├── page-header.tsx      # reusable eyebrow + H1 header
+│   ├── profile-dialog.tsx   # name / password / theme / view settings
+│   ├── site-header.tsx
+│   └── site-footer.tsx      # contains APP_VERSION
+├── integrations/supabase/   # auto-generated — do not edit
+├── lib/
+│   └── languages.ts         # Google Translate language list + helpers
+├── routes/
+│   ├── __root.tsx           # root shell (fonts, providers, <Outlet />)
+│   ├── index.tsx            # landing page
+│   ├── demo.tsx             # public bilingual screener
+│   ├── auth.tsx             # login + signup
+│   ├── forms.$formId.tsx    # public form responder
+│   └── _authenticated/
+│       ├── route.tsx                       # auth gate
+│       ├── dashboard.tsx
+│       ├── forms.$formId.edit.tsx          # question builder
+│       └── forms.$formId.responses.tsx     # creator response view
+└── styles.css               # Tailwind v4 + design tokens
+```
+
+---
+
+🗄️ Database schema
+
+All tables live in `public` with RLS enabled.
+
+- `forms` — `id`, `user_id`, `title`, `description`, `require_login`, `created_at`
+- `questions` — `id`, `form_id`, `type` (`short` | `choice` | `rating`), `label`, `options jsonb`, `order`
+- `responses` — `id`, `form_id`, `answers jsonb`, `submitted_at`
+- `profiles` — `id`, `display_name`, `theme`, `forms_view` (auto-created via trigger on signup)
+- `user_roles` + `has_role()` security-definer function (roles stored separately from profiles)
+
+Row-Level Security highlights
+- `forms`: owners can CRUD their own; public `SELECT` so shared links resolve.
+- `questions`: public `SELECT` unless the parent form has `require_login = true`.
+- `responses`: anonymous `INSERT` allowed only when the form is public; authenticated `INSERT` otherwise.
+- All public-schema tables have explicit `GRANT`s to `anon` / `authenticated` / `service_role`.
+
+---
+
+🔐 Auth
+
+- Email/password + Google OAuth via Lovable Cloud.
+- Email auto-confirm is on for the demo (disable before going to production).
+- Protected routes live under `src/routes/_authenticated/` and redirect unauthenticated visitors to `/auth`.
+
+---
+
+🌐 Routes
+
+| Path | Public? | Description |
+|---|---|---|
+| `/` | ✅ | Landing page |
+| `/demo` | ✅ | Bilingual demo screener |
+| `/auth` | ✅ | Sign in / sign up |
+| `/forms/:formId` | ✅ | Public form responder (unless `require_login`) |
+| `/dashboard` | 🔒 | User's forms |
+| `/forms/:formId/edit` | 🔒 (owner) | Question builder |
+| `/forms/:formId/responses` | 🔒 (owner) | Submissions table |
+
+---
+
+⚠️ Important note
+
+This tool does not determine EL/EB status. Official identification of an English Learner / Emergent Bilingual student requires the school's formal review process and, when applicable, a state-approved English language proficiency assessment. Home Language Screener only collects home language information and surfaces a next-step recommendation.
+
+---
+
+📦 Versioning
+
+Versions follow `MM.DD.YYYY.iteration` (e.g. `06.24.2026.02`) and are displayed in the site footer (`src/components/site-footer.tsx`).
+
+---
